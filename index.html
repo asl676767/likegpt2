@@ -17,7 +17,91 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       padding: 20px;
+    }
+
+    /* LOGIN SCREEN */
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    #loginScreen h1 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      color: #ffe44d;
+      text-shadow: 0 3px 0 #b8860b;
+      text-align: center;
+    }
+
+    #loginScreen p {
+      color: #c9a8ff;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .login-box {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,228,77,0.3);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .login-box input {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,228,77,0.4);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .login-box input::placeholder { color: #8a6bac; }
+    .login-box input:focus { border-color: #ffe44d; }
+
+    .login-box button {
+      background: linear-gradient(135deg, #ffe44d, #f59e0b);
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #1a0533;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .login-box button:hover { transform: scale(1.03); }
+    .login-box button:active { transform: scale(0.97); }
+
+    #loginError {
+      display: none;
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    /* MAIN APP */
+    #mainApp {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
 
     .header {
@@ -219,42 +303,76 @@
 </head>
 <body>
 
-  <div class="header">
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
     <div class="star-icon">⭐🏆⭐</div>
-    <h1>Lukegpt</h1>
-    <p>Ask Luke !</p>
-  </div>
-
-  <div class="suggestions" id="suggestions">
-    <button class="suggestion-btn" onclick="fillQuestion('How does gravity work?')">🌌 How does gravity work?</button>
-    <button class="suggestion-btn" onclick="fillQuestion('What is photosynthesis?')">🌿 What is photosynthesis?</button>
-    <button class="suggestion-btn" onclick="fillQuestion('Explain the internet')">🌐 Explain the internet</button>
-    <button class="suggestion-btn" onclick="fillQuestion('How do airplanes fly?')">✈️ How do airplanes fly?</button>
-  </div>
-
-  <div class="chat-box" id="chatBox">
-    <div class="empty-state" id="emptyState">
-      <div class="big">🎮</div>
-      <div>Ask me anything, Brawler!</div>
+    <h1>Likegpt</h1>
+    <p>Enter your credentials to access the Brawl Stars AI</p>
+    <div class="login-box">
+      <input type="text" id="loginUser" placeholder="Username" autocomplete="off" />
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="off" />
+      <button onclick="tryLogin()">🏆 Login</button>
+      <div id="loginError">⚠️ Wrong username or password!</div>
     </div>
   </div>
 
-  <div class="input-row">
-    <textarea id="questionInput" placeholder="Ask anything, Brawler..." rows="1"></textarea>
-    <button id="sendBtn" onclick="askQuestion()">🏆 Ask</button>
+  <!-- MAIN APP (hidden until login) -->
+  <div id="mainApp">
+    <div class="header">
+      <div class="star-icon">⭐🏆⭐</div>
+      <h1>Lukegpt</h1>
+      <p>Ask Luke!</p>
+    </div>
+
+    <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="fillQuestion('How does gravity work?')">🌌 How does gravity work?</button>
+      <button class="suggestion-btn" onclick="fillQuestion('What is photosynthesis?')">🌿 What is photosynthesis?</button>
+      <button class="suggestion-btn" onclick="fillQuestion('Explain the internet')">🌐 Explain the internet</button>
+      <button class="suggestion-btn" onclick="fillQuestion('How do airplanes fly?')">✈️ How do airplanes fly?</button>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+      <div class="empty-state" id="emptyState">
+        <div class="big">🎮</div>
+        <div>Ask me anything, Brawler!</div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <textarea id="questionInput" placeholder="Ask anything, Brawler..." rows="1"></textarea>
+      <button id="sendBtn" onclick="askQuestion()">🏆 Ask</button>
+    </div>
   </div>
 
   <script>
-    const SYSTEM_PROMPT = `You are a fun AI assistant that explains EVERYTHING using Brawl Stars references, characters, mechanics, and terms. 
+    const _s = '5317094bb6fff268e203dec082265ae4';
+    const _u = 'fc05d400a01e83324b197f4b21ce724be7d3953ad7c49b4dd71c06132db83133';
+    const _p = 'c6696d3dcc7c98dcfa60041dcbea0422cd0bc27900bd87e319588efcb03536c6';
 
-Rules:
-- Use Brawl Stars brawlers (like Shelly, Colt, Spike, Mortis, Leon, etc.) as analogies or examples
-- Reference game modes like Gem Grab, Showdown, Brawl Ball, Heist, etc.
-- Use in-game terms: trophies, power points, star powers, gadgets, super attacks, gems, elixir, boxes
-- Keep it fun, exciting, and easy to understand
-- Start with a Brawl Stars-themed exclamation like "Push those trophies!" or "Drop that super!"
-- Make the explanation genuinely accurate but wrapped in Brawl Stars flavor
-- Use emojis occasionally for flair`;
+    async function hashVal(val) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(val + _s);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function tryLogin() {
+      const u = document.getElementById('loginUser').value;
+      const p = document.getElementById('loginPass').value;
+      const hu = await hashVal(u);
+      const hp = await hashVal(p);
+      if (hu === _u && hp === _p) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryLogin();
+    });
 
     let messages = [];
     let isLoading = false;
@@ -300,7 +418,7 @@ Rules:
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      return content; // return so we can stream into it
+      return content;
     }
 
     function addTyping() {
