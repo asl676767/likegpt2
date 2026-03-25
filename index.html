@@ -18,7 +18,7 @@
       justify-content: center;
       padding: 20px;
     }
-    #loginScreen {
+    #loginScreen, #premiumScreen {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -26,7 +26,8 @@
       width: 100%;
       max-width: 380px;
     }
-    #loginScreen h1 {
+    #premiumScreen { display: none; }
+    #loginScreen h1, #premiumScreen h1 {
       font-family: 'Nunito', sans-serif;
       font-weight: 900;
       font-size: 2.2rem;
@@ -34,7 +35,7 @@
       text-shadow: 0 3px 0 #b8860b;
       text-align: center;
     }
-    #loginScreen p { color: #c9a8ff; font-size: 0.9rem; text-align: center; }
+    #loginScreen p, #premiumScreen p { color: #c9a8ff; font-size: 0.9rem; text-align: center; }
     .login-box {
       background: rgba(255,255,255,0.05);
       border: 2px solid rgba(255,228,77,0.3);
@@ -72,7 +73,7 @@
       transition: transform 0.1s;
     }
     .login-box button:hover { transform: scale(1.03); }
-    #loginError { display: none; color: #ff6b6b; font-size: 0.85rem; text-align: center; }
+    .error-msg { display: none; color: #ff6b6b; font-size: 0.85rem; text-align: center; }
     #mainApp { display: none; flex-direction: column; align-items: center; width: 100%; }
     .header { text-align: center; margin-bottom: 24px; margin-top: 10px; }
     .header h1 {
@@ -85,6 +86,16 @@
     }
     .header p { color: #c9a8ff; font-size: 0.95rem; margin-top: 6px; }
     .star-icon { font-size: 1.6rem; }
+    .prompt-counter {
+      color: #c9a8ff;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      align-self: flex-end;
+      max-width: 680px;
+      width: 100%;
+      text-align: right;
+    }
+    .prompt-counter.warning { color: #ff9944; }
     .chat-box {
       width: 100%;
       max-width: 680px;
@@ -258,7 +269,19 @@
       <input type="text" id="loginUser" placeholder="Username" autocomplete="off" />
       <input type="password" id="loginPass" placeholder="Password" autocomplete="off" />
       <button onclick="tryLogin()">🏆 Login</button>
-      <div id="loginError">⚠️ Wrong username or password!</div>
+      <div class="error-msg" id="loginError">⚠️ Wrong username or password!</div>
+    </div>
+  </div>
+
+  <!-- PREMIUM SCREEN -->
+  <div id="premiumScreen">
+    <div class="star-icon">🔒🏆🔒</div>
+    <h1>Premium Required</h1>
+    <p>You've used your 10 free prompts! Enter the premium password to unlock unlimited access.</p>
+    <div class="login-box">
+      <input type="password" id="premiumPass" placeholder="Premium password" autocomplete="off" />
+      <button onclick="tryPremium()">🏆 Unlock Premium</button>
+      <div class="error-msg" id="premiumError">⚠️ Wrong premium password!</div>
     </div>
   </div>
 
@@ -276,6 +299,8 @@
       <button class="suggestion-btn" onclick="fillQuestion('Explain the internet')">🌐 Explain the internet</button>
       <button class="suggestion-btn" onclick="fillQuestion('How do airplanes fly?')">✈️ How do airplanes fly?</button>
     </div>
+
+    <div class="prompt-counter" id="promptCounter">10 free prompts remaining</div>
 
     <div class="chat-box" id="chatBox">
       <div class="empty-state" id="emptyState">
@@ -301,6 +326,11 @@
     const _s = '5317094bb6fff268e203dec082265ae4';
     const _u = 'fc05d400a01e83324b197f4b21ce724be7d3953ad7c49b4dd71c06132db83133';
     const _p = 'c6696d3dcc7c98dcfa60041dcbea0422cd0bc27900bd87e319588efcb03536c6';
+    const _pp = '3b40fe65ae37e9930bc5b6616f46ea7ace4dfefbb8ac9fb7ada2558e0f2aafb4';
+
+    const FREE_LIMIT = 10;
+    let promptCount = 0;
+    let isPremium = false;
 
     async function hashVal(val) {
       const encoder = new TextEncoder();
@@ -323,9 +353,32 @@
       }
     }
 
+    async function tryPremium() {
+      const p = document.getElementById('premiumPass').value;
+      const hp = await hashVal(p);
+      if (hp === _pp) {
+        isPremium = true;
+        document.getElementById('premiumScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'flex';
+        document.getElementById('promptCounter').textContent = '⭐ Premium — unlimited prompts!';
+        document.getElementById('promptCounter').classList.remove('warning');
+      } else {
+        document.getElementById('premiumError').style.display = 'block';
+      }
+    }
+
+    function updateCounter() {
+      if (isPremium) return;
+      const remaining = FREE_LIMIT - promptCount;
+      const counter = document.getElementById('promptCounter');
+      counter.textContent = remaining + ' free prompt' + (remaining === 1 ? '' : 's') + ' remaining';
+      if (remaining <= 3) counter.classList.add('warning');
+    }
+
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') {
-        tryLogin();
+      if (e.key === 'Enter') {
+        if (document.getElementById('loginScreen').style.display !== 'none') tryLogin();
+        if (document.getElementById('premiumScreen').style.display !== 'none') tryPremium();
       }
     });
 
@@ -372,33 +425,25 @@
       const chatBox = document.getElementById('chatBox');
       const empty = document.getElementById('emptyState');
       if (empty) empty.remove();
-
       const div = document.createElement('div');
       div.className = 'message ' + role;
-
       const avatar = document.createElement('div');
       avatar.className = 'avatar ' + (role === 'ai' ? 'ai-avatar' : 'usr-avatar');
       avatar.textContent = role === 'ai' ? '🤖' : '🎮';
-
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-
       const label = document.createElement('div');
       label.className = 'label';
       label.textContent = role === 'ai' ? 'Brawl AI' : 'You';
-
       bubble.appendChild(label);
-
       if (imageSrc) {
         const img = document.createElement('img');
         img.src = imageSrc;
         bubble.appendChild(img);
       }
-
       const content = document.createElement('div');
       content.textContent = text;
       bubble.appendChild(content);
-
       div.appendChild(avatar);
       div.appendChild(bubble);
       chatBox.appendChild(div);
@@ -443,6 +488,12 @@
       const question = input.value.trim();
       if (!question && !currentImageBase64) return;
 
+      if (!isPremium && promptCount >= FREE_LIMIT) {
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('premiumScreen').style.display = 'flex';
+        return;
+      }
+
       const imageToShow = currentImageBase64 ? 'data:' + currentImageType + ';base64,' + currentImageBase64 : null;
       const imageBase64 = currentImageBase64;
       const imageType = currentImageType;
@@ -475,6 +526,14 @@
         addMessage('ai', reply);
         messages.push({ role: 'assistant', content: reply });
 
+        promptCount++;
+        updateCounter();
+
+        if (!isPremium && promptCount >= FREE_LIMIT) {
+          document.getElementById('mainApp').style.display = 'none';
+          document.getElementById('premiumScreen').style.display = 'flex';
+        }
+
       } catch (err) {
         removeTyping();
         addMessage('ai', '⚠️ Super failed to charge! Check your connection and try again.');
@@ -484,6 +543,8 @@
       document.getElementById('sendBtn').disabled = false;
       input.focus();
     }
+
+    updateCounter();
   </script>
 </body>
 </html>
