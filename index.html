@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lukegpt</title>
+  <title>Likegpt</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -86,48 +86,17 @@
     }
     .header p { color: #c9a8ff; font-size: 0.95rem; margin-top: 6px; }
     .star-icon { font-size: 1.6rem; }
-    .ai-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      width: 100%;
-      max-width: 680px;
-    }
-    .ai-btn {
-      flex: 1;
-      padding: 10px 6px;
-      border-radius: 12px;
-      border: 2px solid rgba(255,228,77,0.3);
-      background: rgba(255,255,255,0.05);
-      color: #c9a8ff;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      height: auto;
-    }
+    .ai-selector { display: flex; gap: 8px; margin-bottom: 14px; width: 100%; max-width: 680px; }
+    .ai-btn { flex: 1; padding: 10px 6px; border-radius: 12px; border: 2px solid rgba(255,228,77,0.3); background: rgba(255,255,255,0.05); color: #c9a8ff; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; height: auto; }
     .ai-btn.active { background: rgba(255,228,77,0.15); border-color: #ffe44d; color: #ffe44d; }
     .ai-btn:hover { border-color: #ffe44d; color: #ffe44d; }
     .ai-btn.edwin-btn.active { background: rgba(100,100,100,0.2); border-color: #888; color: #aaa; }
     .ai-btn.edwin-btn:hover { border-color: #888; color: #aaa; }
+    .ai-btn.gabriel-btn.active { background: rgba(180,0,0,0.2); border-color: #ff4444; color: #ff8080; }
+    .ai-btn.gabriel-btn:hover { border-color: #ff4444; color: #ff8080; }
     .prompt-counter { color: #c9a8ff; font-size: 0.8rem; margin-bottom: 8px; align-self: flex-end; max-width: 680px; width: 100%; text-align: right; }
     .prompt-counter.warning { color: #ff9944; }
-    .chat-box {
-      width: 100%;
-      max-width: 680px;
-      background: rgba(255,255,255,0.05);
-      border: 2px solid rgba(255,228,77,0.3);
-      border-radius: 20px;
-      padding: 20px;
-      min-height: 300px;
-      max-height: 460px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
+    .chat-box { width: 100%; max-width: 680px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,228,77,0.3); border-radius: 20px; padding: 20px; min-height: 300px; max-height: 460px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
     .chat-box::-webkit-scrollbar { width: 6px; }
     .chat-box::-webkit-scrollbar-thumb { background: #ffe44d55; border-radius: 10px; }
     .message { display: flex; gap: 10px; align-items: flex-start; animation: popIn 0.25s ease; }
@@ -209,17 +178,17 @@
   <div id="mainApp">
     <div class="header">
       <div class="star-icon">⭐🏆⭐</div>
-      <h1>Lukegpt</h1>
-      <p>Choose your AI below!</p>
+      <h1>Likegpt</h1>
+      <p id="headerSub">Choose your AI below!</p>
     </div>
 
-    <div class="ai-selector">
+    <div class="ai-selector" id="aiSelector">
       <button class="ai-btn active" id="btnLike" onclick="switchAI('like')">🏆 LikeGPT</button>
-      <button class="ai-btn" id="btnGabriel" onclick="switchAI('gabriel')">😤 GabrielGPT</button>
+      <button class="ai-btn gabriel-btn" id="btnGabriel" onclick="switchAI('gabriel')">😤 GabrielGPT</button>
       <button class="ai-btn edwin-btn" id="btnEdwin" onclick="switchAI('edwin')">🗡️ EdwinGPT</button>
     </div>
 
-    <div class="suggestions" id="suggestionBar">
+    <div class="suggestions">
       <button class="suggestion-btn" onclick="fillQuestion('How does gravity work?')">🌌 How does gravity work?</button>
       <button class="suggestion-btn" onclick="fillQuestion('What is photosynthesis?')">🌿 What is photosynthesis?</button>
       <button class="suggestion-btn" onclick="fillQuestion('Explain the internet')">🌐 Explain the internet</button>
@@ -250,14 +219,28 @@
 
   <script>
     const _s = '5317094bb6fff268e203dec082265ae4';
-    const _u = 'fc05d400a01e83324b197f4b21ce724be7d3953ad7c49b4dd71c06132db83133';
-    const _p = 'c6696d3dcc7c98dcfa60041dcbea0422cd0bc27900bd87e319588efcb03536c6';
-    const _pp = '3b40fe65ae37e9930bc5b6616f46ea7ace4dfefbb8ac9fb7ada2558e0f2aafb4';
 
+    const USERS = {
+      'fc05d400a01e83324b197f4b21ce724be7d3953ad7c49b4dd71c06132db83133': {
+        passHash: 'c6696d3dcc7c98dcfa60041dcbea0422cd0bc27900bd87e319588efcb03536c6',
+        ai: 'like'
+      },
+      '0a1cea69f2a22b7215bdd78dd4092ea23099795d48e2c8d7a4871c92d5b8a902': {
+        passHash: '959dfaebb69de4b649f9acd061f6d3e89ea4bde6be5be6027fd2391e3a6cf98a',
+        ai: 'gabriel'
+      },
+      '91dc95e2eb610db96dcf41dadb924893bebea65d9472b0b25a08d678664954d4': {
+        passHash: '12223a6a49f98bfcc4268f70d38f12382c063eb0b71068379422015feb406ed0',
+        ai: 'edwin'
+      }
+    };
+
+    const _pp = '3b40fe65ae37e9930bc5b6616f46ea7ace4dfefbb8ac9fb7ada2558e0f2aafb4';
     const FREE_LIMIT = 10;
     let promptCount = 0;
     let isPremium = false;
     let currentAI = 'like';
+    let lockedAI = null;
 
     const LIKE_SYSTEM = `You are LikeGPT, a helpful and fun AI assistant. Always format your responses clearly. Start with a short one line intro. Use numbered steps when explaining a process. Use bullet points for lists. Use clear paragraph breaks between ideas. Keep sentences short and easy to read. End with a fun Brawl Stars themed sign off like "Trophy earned! 🏆" or "Super charged! ⚡". Also use Brawl Stars references and brawlers like Shelly, Colt, Spike, Mortis as examples where it fits naturally. Keep it fun but always easy to follow!`;
 
@@ -278,11 +261,29 @@
       const p = document.getElementById('loginPass').value;
       const hu = await hashVal(u);
       const hp = await hashVal(p);
-      if (hu === _u && hp === _p) {
+      const user = USERS[hu];
+      if (user && user.passHash === hp) {
+        lockedAI = user.ai;
+        currentAI = user.ai;
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'flex';
+        setupForUser();
       } else {
         document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    function setupForUser() {
+      if (lockedAI === 'gabriel') {
+        document.getElementById('aiSelector').style.display = 'none';
+        document.getElementById('headerSub').textContent = 'GabrielGPT — good luck.';
+        switchAI('gabriel');
+      } else if (lockedAI === 'edwin') {
+        document.getElementById('aiSelector').style.display = 'none';
+        document.getElementById('headerSub').textContent = 'EdwinGPT — you poor thing.';
+        switchAI('edwin');
+      } else {
+        switchAI('like');
       }
     }
 
@@ -317,7 +318,7 @@
         document.getElementById('sendBtn').style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
         document.getElementById('sendBtn').style.color = '#fff';
       } else if (ai === 'edwin') {
-        newEmpty.innerHTML = '<div class="big">🗡️</div><div>oh great, another person who thinks I\'ll actually help them. cute.</div>';
+        newEmpty.innerHTML = '<div class="big">🗡️</div><div>oh great. another person who thinks I\'ll help them. cute.</div>';
         document.getElementById('questionInput').placeholder = 'Ask Edwin... (bad idea)';
         document.getElementById('sendBtn').textContent = '🗡️ Ask';
         document.getElementById('sendBtn').style.background = 'linear-gradient(135deg, #555, #888)';
@@ -410,10 +411,7 @@
     }
 
     document.getElementById('questionInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        askQuestion();
-      }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askQuestion(); }
     });
 
     function getAvatarEmoji() {
@@ -421,23 +419,25 @@
       if (currentAI === 'edwin') return '🗡️';
       return '🤖';
     }
-
     function getAvatarClass() {
       if (currentAI === 'gabriel') return 'gabriel-avatar';
       if (currentAI === 'edwin') return 'edwin-avatar';
       return 'ai-avatar';
     }
-
     function getMessageClass() {
       if (currentAI === 'gabriel') return 'gabriel';
       if (currentAI === 'edwin') return 'edwin';
       return 'ai';
     }
-
     function getLabelName() {
       if (currentAI === 'gabriel') return 'GabrielGPT';
       if (currentAI === 'edwin') return 'EdwinGPT';
       return 'Brawl AI';
+    }
+    function getSystemPrompt() {
+      if (currentAI === 'gabriel') return GABRIEL_SYSTEM;
+      if (currentAI === 'edwin') return EDWIN_SYSTEM;
+      return LIKE_SYSTEM;
     }
 
     function addMessage(role, text, imageSrc) {
@@ -455,11 +455,7 @@
       label.className = 'label';
       label.textContent = role === 'ai' ? getLabelName() : 'You';
       bubble.appendChild(label);
-      if (imageSrc) {
-        const img = document.createElement('img');
-        img.src = imageSrc;
-        bubble.appendChild(img);
-      }
+      if (imageSrc) { const img = document.createElement('img'); img.src = imageSrc; bubble.appendChild(img); }
       const content = document.createElement('div');
       if (role === 'ai') { content.innerHTML = formatText(text); } else { content.textContent = text; }
       bubble.appendChild(content);
@@ -501,12 +497,6 @@
       if (t) t.remove();
     }
 
-    function getSystemPrompt() {
-      if (currentAI === 'gabriel') return GABRIEL_SYSTEM;
-      if (currentAI === 'edwin') return EDWIN_SYSTEM;
-      return LIKE_SYSTEM;
-    }
-
     async function askQuestion() {
       if (isLoading) return;
       const input = document.getElementById('questionInput');
@@ -536,12 +526,7 @@
         const response = await fetch('https://likegpt.aaron-lu-marin.workers.dev', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: messages,
-            image: imageBase64 || null,
-            imageType: imageType || null,
-            systemPrompt: getSystemPrompt()
-          })
+          body: JSON.stringify({ messages: messages, image: imageBase64 || null, imageType: imageType || null, systemPrompt: getSystemPrompt() })
         });
 
         const data = await response.json();
