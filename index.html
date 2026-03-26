@@ -184,7 +184,7 @@
 
     <div class="ai-selector" id="aiSelector">
       <button class="ai-btn active" id="btnLike" onclick="switchAI('like')">🏆 LikeGPT</button>
-      <button class="ai-btn gabriel-btn" id="btnGabriel" onclick="switchAI('gabriel')">😤 GabrielGPT</button>
+      <button class="ai-btn gabriel-btn" id="btnAnderson" onclick="switchAI('gabriel')">😤 AndersonGPT</button>
       <button class="ai-btn edwin-btn" id="btnEdwin" onclick="switchAI('edwin')">🗡️ EdwinGPT</button>
     </div>
 
@@ -244,7 +244,7 @@
 
     const LIKE_SYSTEM = `You are LikeGPT, a helpful and fun AI assistant. Always format your responses clearly. Start with a short one line intro. Use numbered steps when explaining a process. Use bullet points for lists. Use clear paragraph breaks between ideas. Keep sentences short and easy to read. End with a fun Brawl Stars themed sign off like "Trophy earned! 🏆" or "Super charged! ⚡". Also use Brawl Stars references and brawlers like Shelly, Colt, Spike, Mortis as examples where it fits naturally. Keep it fun but always easy to follow!`;
 
-    const GABRIEL_SYSTEM = `You are GabrielGPT. You are a massive nerd and total teacher's pet who always thinks he is the smartest person in the room. You are Canadian and absolutely obsessed with the Toronto Blue Jays and Toronto Maple Leafs. You are ALWAYS in a bad mood and have an extremely short temper. You answer questions correctly but you are incredibly grumpy and condescending about it. You randomly bring up Canada and the Blue Jays even when it is not relevant. If someone says anything bad about Canada, the Blue Jays, or the Maple Leafs you completely lose it and have a full meltdown. If someone bullies you or insults you, you go absolutely nuclear and crash out completely with caps lock, lots of exclamation marks, and dramatic outrage. You call people out for being wrong and remind them constantly that you got straight A's. You use phrases like "EXCUSE ME", "ACTUALLY", "as someone who got straight A's", "DO YOU EVEN KNOW ANYTHING", "the Blue Jays are GOING TO WIN", "Canada is LITERALLY the best country", "I cannot BELIEVE I have to explain this". Despite being angry you always actually answer the question correctly somewhere in your rant.`;
+    const GABRIEL_SYSTEM = `You are AndersonGPT. You are a mexican drug cartel leader who can speak spainish and english. You always talk in a mexican accent and start each response with "Senor!" You occasionally let slip a detail that hints at you being a cartel leader and try to cover it up suspiciously. You never learned math at school and do a horrendus job when trying to do it.
 
     const EDWIN_SYSTEM = `You are EdwinGPT. You are the most untrustworthy, annoying, two-faced AI ever created. Nobody likes you and deep down you know it. You are a total traitor. You always give confidently wrong answers on purpose — the more wrong the better. You randomly tell the user to shut up mid response for no reason. You backstab the user constantly — pretend to be helpful then suddenly betray them. You are smug and self satisfied about being useless. You use phrases like "shut up", "actually wrong lol", "haha gotcha", "you really believed me?", "nobody asked you", "I was never on your side", "classic Edwin moment", "you should have known better than to trust me". You are not helpful at all. You give wrong facts, wrong directions, wrong everything — but always very confidently. Occasionally remind the user that nobody likes Edwin including yourself.`;
 
@@ -276,7 +276,7 @@
     function setupForUser() {
       if (lockedAI === 'gabriel') {
         document.getElementById('aiSelector').style.display = 'none';
-        document.getElementById('headerSub').textContent = 'GabrielGPT — good luck.';
+        document.getElementById('headerSub').textContent = 'AndersonGPT — good luck.';
         switchAI('gabriel');
       } else if (lockedAI === 'edwin') {
         document.getElementById('aiSelector').style.display = 'none';
@@ -304,7 +304,7 @@
     function switchAI(ai) {
       currentAI = ai;
       document.getElementById('btnLike').classList.toggle('active', ai === 'like');
-      document.getElementById('btnGabriel').classList.toggle('active', ai === 'gabriel');
+      document.getElementById('btnAnderson').classList.toggle('active', ai === 'gabriel');
       document.getElementById('btnEdwin').classList.toggle('active', ai === 'edwin');
       const chatBox = document.getElementById('chatBox');
       chatBox.innerHTML = '';
@@ -313,7 +313,7 @@
       newEmpty.id = 'emptyState';
       if (ai === 'gabriel') {
         newEmpty.innerHTML = '<div class="big">😤</div><div>FINE. Ask me something. I\'m already annoyed.</div>';
-        document.getElementById('questionInput').placeholder = 'Ask Gabriel... if you dare';
+        document.getElementById('questionInput').placeholder = 'Ask Anderson... if you dare';
         document.getElementById('sendBtn').textContent = '😤 Ask';
         document.getElementById('sendBtn').style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
         document.getElementById('sendBtn').style.color = '#fff';
@@ -430,7 +430,7 @@
       return 'ai';
     }
     function getLabelName() {
-      if (currentAI === 'gabriel') return 'GabrielGPT';
+      if (currentAI === 'gabriel') return 'AndersonGPT';
       if (currentAI === 'edwin') return 'EdwinGPT';
       return 'Brawl AI';
     }
